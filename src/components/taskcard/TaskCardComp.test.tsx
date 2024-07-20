@@ -11,7 +11,7 @@ const mockShowEditModal = jest.fn();
 const mockHandleDeleteTask = jest.fn();
 const mockFavoriteTasks = new Set<number>();
 
-// Моки для хуков
+
 jest.mock('./../../hooks/useTaskFunc', () => ({
     __esModule: true,
     default: () => ({
@@ -42,14 +42,14 @@ const task: Task = {
 };
 
 describe('<TaskCardComp />', () => {
-    it('should render task details correctly', () => {
+    it('Рендер задачи', () => {
         const { getByText } = render(<TaskCardComp task={task} />);
         expect(getByText('Название: Test Task')).toBeInTheDocument();
         expect(getByText('Описание: Test Description')).toBeInTheDocument();
         expect(getByText('Статус: Не готово')).toBeInTheDocument();
     });
 
-    it('should render favorite button with StarOutlined icon when not favorited', () => {
+    it('Рендер избранного', () => {
         const { container } = render(<TaskCardComp task={task} />);
         const button = container.querySelector('button');
         console.log(button);
@@ -57,7 +57,7 @@ describe('<TaskCardComp />', () => {
         expect(button?.querySelector('svg')).toHaveAttribute('data-icon', 'star'); 
     });
 
-    it('should call handleToggleFavorite when favorite button is clicked', () => {
+    it('Клик в избранное', () => {
         const { container } = render(<TaskCardComp task={task} />);
         const button = container.querySelector('button');
         if (button) {
@@ -69,45 +69,41 @@ describe('<TaskCardComp />', () => {
         }
     });
 
-    it('should display dropdown menu with correct options', () => {
+    it('Выпадающее меню рендер', () => {
         const { getByRole } = render(<TaskCardComp task={task} />);
         const dropdown = getByRole('button', { name: /ellipsis/i });
         fireEvent.click(dropdown);
-        // Проверяем наличие пунктов меню
         expect(getByRole('menuitem', { name: /Готово/i })).toBeInTheDocument();
         expect(getByRole('menuitem', { name: /Редактировать/i })).toBeInTheDocument();
         expect(getByRole('menuitem', { name: /Удалить/i })).toBeInTheDocument();
     });
 
-    it('should call handleStatusUpdate when status menu item is clicked', () => {
+    it('Обновление статуса задачи', () => {
         const { getByRole } = render(<TaskCardComp task={task} />);
         const dropdown = getByRole('button', { name: /ellipsis/i });
         fireEvent.click(dropdown);
         const statusItem = getByRole('menuitem', { name: /Готово/i });
         fireEvent.click(statusItem);
-        // Проверяем, что функция была вызвана
         const { handleStatusUpdate } = require('./../../hooks/useTaskFunc').default();
         expect(handleStatusUpdate).toHaveBeenCalledWith(task.id, 'completed');
     });
 
-    it('should call showEditModal when edit menu item is clicked', () => {
+    it('Модальное окно открывается', () => {
         const { getByRole } = render(<TaskCardComp task={task} />);
         const dropdown = getByRole('button', { name: /ellipsis/i });
         fireEvent.click(dropdown);
         const editItem = getByRole('menuitem', { name: /Редактировать/i });
         fireEvent.click(editItem);
-        // Проверяем, что функция была вызвана
         const { showEditModal } = require('./../../hooks/useTaskFunc').default();
         expect(showEditModal).toHaveBeenCalledWith(task);
     });
 
-    it('should call handleDeleteTask when delete menu item is clicked', () => {
+    it('Задача удаляется', () => {
         const { getByRole } = render(<TaskCardComp task={task} />);
         const dropdown = getByRole('button', { name: /ellipsis/i });
         fireEvent.click(dropdown);
         const deleteItem = getByRole('menuitem', { name: /Удалить/i });
         fireEvent.click(deleteItem);
-        // Проверяем, что функция была вызвана
         const { handleDeleteTask } = require('./../../hooks/useTaskFunc').default();
         expect(handleDeleteTask).toHaveBeenCalledWith(task.id);
     });
